@@ -88,6 +88,7 @@
               <p class="text-sm text-gray-500 dark:text-gray-500">{{ job.period }}</p>
             </div>
             <p class="text-gray-600 dark:text-gray-300">{{ job.description }}</p>
+            <p class="text-gray-600 dark:text-gray-300">{{ job.description2 }}</p>
           </div>
         </div>
       </div>
@@ -104,7 +105,10 @@
             <div class="text-center">
               <component :is="skill.icon" class="h-8 w-8 mx-auto mb-2 text-gray-700 dark:text-gray-300" />
               <h3 class="font-medium text-gray-900 dark:text-white">{{ skill.name }}</h3>
+            </div>
+            <div class="p-4">
               <p class="font-small text-gray-900 dark:text-white">{{ skill.description }}</p>
+              <p class="font-small text-gray-900 dark:text-white">{{ skill.description2 }}</p>
             </div>
           </div>
         </div>
@@ -141,23 +145,54 @@
 
     <!-- Contact Section -->
     <section id="contact" class="py-20 bg-white dark:bg-gray-800">
-      <div class="max-w-6xl mx-auto px-8">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Contact</h2>
-        <div class="max-w-lg mx-auto">
-          <form class="space-y-6">
+      <div class="max-w-5xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-12">Get in Touch</h2>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">
+              I'm always open to new opportunities and interesting projects. 
+              Feel free to reach out if you'd like to collaborate!
+            </p>
+            <div class="space-y-4">
+              <a href="mailto:ralphvisco38@gmail.com" 
+                 class="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                <MailIcon class="h-5 w-5 mr-2" />
+                ralphvisco38@gmail.com
+              </a>
+              <a href="https://github.com/reVisco" 
+                 target="_blank"
+                 class="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                <GithubIcon class="h-5 w-5 mr-2" />
+                @reVisco
+              </a>
+            </div>
+          </div>
+          <form @submit.prevent="handleSubmit" class="space-y-4">
             <div>
-              <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
-              <input type="text" id="name" name="name" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
+              <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+              <input type="text" 
+                     id="name" 
+                     v-model="contactForm.name"
+                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500" />
             </div>
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-              <input type="email" id="email" name="email" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
+              <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+              <input type="email" 
+                     id="email" 
+                     v-model="contactForm.email"
+                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500" />
             </div>
             <div>
-              <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
-              <textarea id="message" name="message" rows="4" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"></textarea>
+              <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
+              <textarea id="message" 
+                        v-model="contactForm.message"
+                        rows="4"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500"></textarea>
             </div>
-            <button type="submit" class="w-full px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">Send Message</button>
+            <button type="submit" 
+                    class="w-full px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+              Send Message
+            </button>
           </form>
         </div>
       </div>
@@ -172,16 +207,71 @@ import {
   SunIcon, 
   MoonIcon, 
   MailIcon, 
-  GithubIcon, 
-  LinkedinIcon, 
   ExternalLinkIcon,
   CodeIcon,
   LayersIcon,
   PaintbrushIcon,
-  DatabaseIcon
+  DatabaseIcon,
+  GithubIcon,
 } from 'lucide-vue-next'
 
 const isDark = ref(false);
+const contactForm = ref({
+  name: '',
+  email: '',
+  message: ''
+});
+
+import emailjs from '@emailjs/browser';
+
+const handleSubmit = async () => {
+  try {
+    // Check email rate limit
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    // Get stored email data
+    const storedData = JSON.parse(localStorage.getItem('emailData') || '{ "count": 0, "month": null, "year": null }');
+    
+    // Reset counter if it's a new month
+    if (storedData.month !== currentMonth || storedData.year !== currentYear) {
+      storedData.count = 0;
+      storedData.month = currentMonth;
+      storedData.year = currentYear;
+    }
+    
+    // Check if limit exceeded
+    if (storedData.count >= 200) {
+      alert('Monthly email limit reached. Please try again next month.');
+      return;
+    }
+
+    const templateParams = {
+      from_name: contactForm.value.name,
+      from_email: contactForm.value.email,
+      message: contactForm.value.message,
+      to_name: 'Ralph Visco',
+    };
+
+    await emailjs.send(
+      'service_yu4d3u9',
+      'template_6ad8xyb',
+      templateParams,
+      'U22WXzTOtQftQ9FhI'
+    );
+
+    // Increment counter and save
+    storedData.count++;
+    localStorage.setItem('emailData', JSON.stringify(storedData));
+
+    alert('Message sent successfully!');
+    contactForm.value = { name: '', email: '', message: '' };
+  } catch (error) {
+    console.error('Error sending email:', error);
+    alert('Failed to send message. Please try again.');
+  }
+};
 const navigation = ref([
   { name: 'About', href: '#about' },
   { name: 'Experience', href: '#experience' },
@@ -192,10 +282,11 @@ const navigation = ref([
 
 const experience = [
   {
-    title: 'Fullstack Developer (OJT)',
+    title: 'Software Engineer (OJT)',
     company: 'Astoria Plaza Pasig',
-    period: '2024',
-    description: 'Developed an inventory management system with QR codes for inventory tracking and management.',
+    period: 'March 2024 - April 2024',
+    description: 'Designed and developed a web-based Inventory Management System with QR code capabilities for the ICT Assets Management Department increasing productivity by 35%.',
+    description2: 'Tech stack: HTML, CSS (Bootstrap 5), JavaScript, PHP, MySQL.' 
   },
   {
     title: 'Freelance Tutor',
@@ -212,15 +303,15 @@ const experience = [
 ]
 
 const skills = [
-  { name: 'Frontend Dev', description: 'HTML', icon: CodeIcon, level: 95 },
+  { name: 'Frontend Dev', description: 'HTML', description2: 'CSS', CodeIcon, level: 95 },
   { name: 'UI/UX Design', icon: PaintbrushIcon, level: 85 },
-  { name: 'Backend Dev', icon: DatabaseIcon, level: 75 },
+  { name: 'Backend Dev', icon: DatabaseIcon, level: 75 }, 
   { name: 'Architecture', icon: LayersIcon, level: 80 }
 ]
 
 const projects = [
   {
-    name: 'E-commerce Platform',
+    name: 'Inventory Management System',
     description: 'A full-featured online shopping platform built with Vue.js and Node.js',
     image: '/placeholder.svg?height=300&width=400',
     link: '#'
