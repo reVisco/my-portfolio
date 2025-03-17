@@ -181,7 +181,7 @@
                   <div class="text-center p-4">
                     <h3 class="text-xl md:text-xl sm:text-lg font-bold text-white mb-2">{{ projects[0].name }}</h3>
                     <p class="text-gray-300 mb-4 text-sm md:text-base">{{ projects[0].description }}</p>
-                    <button @click="openImage(image, `${projects[0].name} - Image ${index + 1}`)" 
+                    <button @click="openProjectImage(image, `${projects[0].name} - Image ${index + 1}`)" 
                        class="inline-flex items-center text-white border border-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors text-sm md:text-base">
                       View Image
                       <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -212,7 +212,7 @@
                   <div class="text-center p-4">
                     <h3 class="text-xl font-bold text-white mb-2">{{ projects[1].name }}</h3>
                     <p class="text-gray-300 mb-4">{{ projects[1].description }}</p>
-                    <button @click="openImage(image, `${projects[1].name} - Image ${index + 1}`)" 
+                    <button @click="openProjectImage(image, `${projects[1].name} - Image ${index + 1}`)" 
                        class="inline-flex items-center text-white border border-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors">
                       View Image
                       <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -338,6 +338,11 @@ const openImage = (viz) => {
   } else {
     clickedViz.value = viz.name;
   }
+};
+
+const openProjectImage = (image, alt) => {
+  selectedImage.value = image;
+  selectedImageAlt.value = alt;
 };
 
 const handleSubmit = async () => {
