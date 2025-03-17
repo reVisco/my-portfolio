@@ -10,7 +10,7 @@
            @click.stop />
     </div>
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-200 dark:border-gray-800">
+    <nav ref="navbar" class="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-200 dark:border-gray-800 transition-transform duration-300" :class="{ '-translate-y-full': isNavbarHidden }">
       <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <a href="#" class="text-xl font-bold text-gray-900 dark:text-white">RV.dev</a>
@@ -23,6 +23,15 @@
                 {{ item.name }}
               </a>
             </nav>
+            <!-- Mobile menu button -->
+            <button @click="isMobileMenuOpen = !isMobileMenuOpen"
+                    class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    aria-label="Toggle mobile menu">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path v-if="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             <button @click="toggleDarkMode" 
                     class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
               <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -32,6 +41,20 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
             </button>
+          </div>
+        </div>
+        <!-- Mobile menu -->
+        <div v-show="isMobileMenuOpen"
+             class="md:hidden fixed inset-x-0 top-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 transform transition-all duration-300 ease-in-out"
+             :class="{'translate-y-0 opacity-100': isMobileMenuOpen, '-translate-y-full opacity-0': !isMobileMenuOpen}">
+          <div class="px-4 py-3 space-y-1">
+            <a v-for="item in navigation"
+               :key="item.name"
+               :href="item.href"
+               @click="isMobileMenuOpen = false"
+               class="block py-2 px-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 rounded-lg transition-colors">
+              {{ item.name }}
+            </a>
           </div>
         </div>
       </div>
@@ -127,12 +150,12 @@
           <div v-for="viz in visualizations" 
                :key="viz.name"
                class="group relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900 aspect-video cursor-pointer"
-               @click="openImage(viz.image, viz.name)">
+               @click="openImage(viz)">
+            <h3 class="absolute top-0 left-0 right-0 p-3 bg-black/70 text-white text-lg font-semibold z-10">{{ viz.name }}</h3>
             <img :src="viz.image" 
                  :alt="viz.name"
                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-              <h3 class="text-xl font-bold text-white mb-2">{{ viz.name }}</h3>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-opacity duration-300 flex flex-col justify-end p-6" :class="{'opacity-100': clickedViz === viz.name, 'opacity-0': clickedViz !== viz.name}">
               <p class="text-gray-200">{{ viz.description }}</p>
             </div>
           </div>
@@ -156,10 +179,10 @@
                      class="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-[1.02]" />
                 <div class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div class="text-center p-4">
-                    <h3 class="text-xl font-bold text-white mb-2">{{ projects[0].name }}</h3>
-                    <p class="text-gray-300 mb-4">{{ projects[0].description }}</p>
+                    <h3 class="text-xl md:text-xl sm:text-lg font-bold text-white mb-2">{{ projects[0].name }}</h3>
+                    <p class="text-gray-300 mb-4 text-sm md:text-base">{{ projects[0].description }}</p>
                     <button @click="openImage(image, `${projects[0].name} - Image ${index + 1}`)" 
-                       class="inline-flex items-center text-white border border-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors">
+                       class="inline-flex items-center text-white border border-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors text-sm md:text-base">
                       View Image
                       <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -293,8 +316,12 @@ import {
 } from 'lucide-vue-next'
 
 const isDark = ref(false);
+const isMobileMenuOpen = ref(false);
 const selectedImage = ref(null);
 const selectedImageAlt = ref('');
+const clickedViz = ref(null);
+const isNavbarHidden = ref(false);
+let lastScrollY = 0;
 const contactForm = ref({
   name: '',
   email: '',
@@ -303,9 +330,14 @@ const contactForm = ref({
 
 import emailjs from '@emailjs/browser';
 
-const openImage = (image, alt) => {
-  selectedImage.value = image;
-  selectedImageAlt.value = alt;
+const openImage = (viz) => {
+  if (clickedViz.value === viz.name) {
+    selectedImage.value = viz.image;
+    selectedImageAlt.value = viz.name;
+    clickedViz.value = null;
+  } else {
+    clickedViz.value = viz.name;
+  }
 };
 
 const handleSubmit = async () => {
@@ -444,7 +476,7 @@ onMounted(() => {
     observer.observe(section);
   });
 
-  // Parallax effect
+  // Parallax effect and navbar scroll handling
   window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
     const parallaxBg = document.querySelector('.parallax-bg');
@@ -454,6 +486,11 @@ onMounted(() => {
       parallaxBg.style.transform = `translateY(${scrolled * 0.5}px)`;
       parallaxContent.style.transform = `translateY(${scrolled * 0.2}px)`;
     }
+
+    // Navbar scroll handling
+    const currentScrollY = window.scrollY;
+    isNavbarHidden.value = currentScrollY > lastScrollY && currentScrollY > 100;
+    lastScrollY = currentScrollY;
   });
 });
 
@@ -542,5 +579,17 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(156, 163, 175, 0.8);
+}
+
+/* Mobile menu transition */
+.mobile-menu-enter-active,
+.mobile-menu-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mobile-menu-enter-from,
+.mobile-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-1rem);
 }
 </style>
