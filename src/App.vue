@@ -427,7 +427,7 @@ const experience = [
 
 const skills = [
   { name: 'Frontend Stack', description: 'HTML\nCSS\nJavaScript', icon: AppWindowIcon, level: 95 },
-  { name: 'Data Analysis', description: 'Python\nTableau', icon: ChartColumnIncreasing },
+  { name: 'Data Analysis', description: 'Python\nTableau\nPower BI', icon: ChartColumnIncreasing },
   { name: 'Backend Stack', description: 'SQL\nNode.js\nPHP', icon: DatabaseIcon }, 
   { name: 'Frameworks', description: 'Django\nVue.js\nBootstrap', icon: LayersIcon }
 ]
