@@ -65,7 +65,7 @@
             accessible user interfaces. When I'm not coding, you can find me contributing to open source 
             projects or writing technical articles on my blog. -->
             I am a graduate in the program of Computer Science at AMA Computer College East-Rizal. I specialize in
-            web-development, data analysis, and data science. I am passionate about working with data and transforming
+            web-development and data analysis. I am passionate about working with data and transforming
             data into meaningful insights through visualizations. I am also interested in machine learning and artificial
             intelligence in data analysis.
           </p>
@@ -107,8 +107,7 @@
               <h3 class="font-medium text-gray-900 dark:text-white">{{ skill.name }}</h3>
             </div>
             <div class="p-4">
-              <p class="font-small text-gray-900 dark:text-white">{{ skill.description }}</p>
-              <p class="font-small text-gray-900 dark:text-white">{{ skill.description2 }}</p>
+              <p class="font-small text-gray-900 dark:text-white whitespace-pre-line">{{ skill.description }}</p>
             </div>
           </div>
         </div>
@@ -213,6 +212,8 @@ import {
   PaintbrushIcon,
   DatabaseIcon,
   GithubIcon,
+  AppWindowIcon,
+  ChartColumnIncreasing,
 } from 'lucide-vue-next'
 
 const isDark = ref(false);
@@ -291,34 +292,34 @@ const experience = [
   {
     title: 'Freelance Tutor',
     company: 'Independent',
-    period: '2022 - 2024',
+    period: '2021 - 2025',
     description: 'Taught subjects online, including web development (JavaScript), and Mathematics to junior and senior high students.'
   },
   {
     title: 'Online English as second Language (ESL) Teacher',
     company: 'Acadsoc',
-    period: '2020 - 2022',
+    period: '2020 - 2021',
     description: 'Taught English as a second language to Chinese students of all ages and levels.'
   },
 ]
 
 const skills = [
-  { name: 'Frontend Dev', description: 'HTML', description2: 'CSS', CodeIcon, level: 95 },
-  { name: 'UI/UX Design', icon: PaintbrushIcon, level: 85 },
-  { name: 'Backend Dev', icon: DatabaseIcon, level: 75 }, 
-  { name: 'Architecture', icon: LayersIcon, level: 80 }
+  { name: 'Frontend Stack', description: 'HTML\nCSS\nJavaScript', icon: AppWindowIcon, level: 95 },
+  { name: 'Data Analysis', description: 'Python\nTableau', icon: ChartColumnIncreasing },
+  { name: 'Backend Stack', description: 'SQL\nNode.js\nPHP', icon: DatabaseIcon }, 
+  { name: 'Frameworks', description: 'Django\nVue.js\nBootstrap', icon: LayersIcon }
 ]
 
 const projects = [
   {
     name: 'Inventory Management System',
-    description: 'A full-featured online shopping platform built with Vue.js and Node.js',
+    description: 'Web-based Inventory Management System with QR code capabilities',
     image: '/placeholder.svg?height=300&width=400',
     link: '#'
   },
   {
-    name: 'Task Management App',
-    description: 'A collaborative task management tool with real-time updates',
+    name: 'Sales Dashboard',
+    description: 'Web-based Sales Dashboard with Sales Prediction using Recurrent Neural Network',
     image: '/placeholder.svg?height=300&width=400',
     link: '#'
   }
