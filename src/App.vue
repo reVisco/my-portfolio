@@ -1,5 +1,14 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Image Modal -->
+    <div v-if="selectedImage" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
+         @click="selectedImage = null">
+      <img :src="selectedImage" 
+           :alt="selectedImageAlt"
+           class="max-w-full max-h-[90vh] object-contain cursor-pointer transform transition-transform duration-300 hover:scale-105"
+           @click.stop />
+    </div>
     <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-200 dark:border-gray-800">
       <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,7 +41,7 @@
     <section id="hero" class="relative pt-32 pb-20 overflow-hidden">
       <div class="parallax-bg absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 dark:from-blue-900/30 dark:to-purple-900/30"></div>
       <div class=" max-w-6xl mx-auto text-center px-8 relative z-10">
-        <img src="./1x1Suit.png?height=150&width=150" 
+        <img :src="getImageUrl('1x1Suit')" 
              alt="Profile picture" 
              class="w-32 h-32 rounded-full mx-auto mb-8 border-4 border-white dark:border-gray-800 shadow-lg transform hover:scale-105 transition-transform duration-300" />
         <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4 animate-fade-in">
@@ -60,10 +69,6 @@
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">About Me</h2>
         <div class="prose dark:prose-invert max-w-none text-justify">
           <p class="text-gray-600 dark:text-gray-300">
-            <!-- I'm a passionate frontend developer with 5+ years of experience building modern web applications. 
-            I specialize in Vue.js, React, and TypeScript, with a strong focus on creating performant and 
-            accessible user interfaces. When I'm not coding, you can find me contributing to open source 
-            projects or writing technical articles on my blog. -->
             I am a graduate in the program of Computer Science at AMA Computer College East-Rizal. I specialize in
             web-development and data analysis. I am passionate about working with data and transforming
             data into meaningful insights through visualizations. I am also interested in machine learning and artificial
@@ -114,30 +119,92 @@
       </div>
     </section>
 
+    <!-- Visualization Showcase Section -->
+    <section id="visualizations" class="py-20">
+      <div class="max-w-6xl mx-auto px-8">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-12">Data Visualizations</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div v-for="viz in visualizations" 
+               :key="viz.name"
+               class="group relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900 aspect-video cursor-pointer"
+               @click="openImage(viz.image, viz.name)">
+            <img :src="viz.image" 
+                 :alt="viz.name"
+                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+              <h3 class="text-xl font-bold text-white mb-2">{{ viz.name }}</h3>
+              <p class="text-gray-200">{{ viz.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Projects Section -->
     <section id="projects" class="py-20">
       <div class="max-w-6xl mx-auto px-8">
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-12">Projects</h2>
-        <div class="grid md:grid-cols-2 gap-8">
-          <div v-for="project in projects" 
-               :key="project.name"
-               class="group relative overflow-hidden rounded-lg">
-            <img :src="project.image" 
-                 :alt="project.name"
-                 class="w-full aspect-video object-cover" />
-            <div class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <div class="text-center p-4">
-                <h3 class="text-xl font-bold text-white mb-2">{{ project.name }}</h3>
-                <p class="text-gray-300 mb-4">{{ project.description }}</p>
-                <a :href="project.link" 
-                   target="_blank"
-                   class="inline-flex items-center text-white border border-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors">
-                  View Project
-                  <ExternalLinkIcon class="ml-2 h-4 w-4" />
-                </a>
+        
+        <!-- Inventory Management System Carousel -->
+        <div class="mb-16">
+          <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Inventory Management System for Astoria Plaza Hotel - Pasig</h3>
+          <Carousel :wrap-around="true" :items-to-show="1" class="rounded-lg overflow-hidden">
+            <Slide v-for="(image, index) in projects[0].images" :key="index">
+              <div class="group relative overflow-hidden aspect-video">
+                <img :src="image" 
+                     :alt="`${projects[0].name} - Image ${index + 1}`"
+                     class="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-[1.02]" />
+                <div class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="text-center p-4">
+                    <h3 class="text-xl font-bold text-white mb-2">{{ projects[0].name }}</h3>
+                    <p class="text-gray-300 mb-4">{{ projects[0].description }}</p>
+                    <button @click="openImage(image, `${projects[0].name} - Image ${index + 1}`)" 
+                       class="inline-flex items-center text-white border border-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors">
+                      View Image
+                      <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </Slide>
+            <template #addons>
+              <Navigation />
+              <Pagination />
+            </template>
+          </Carousel>
+        </div>
+
+        <!-- Sales Dashboard Carousel -->
+        <div>
+          <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Sales Dashboard for Rilem Pharma Corp.</h3>
+          <Carousel :wrap-around="true" :items-to-show="1" class="rounded-lg overflow-hidden">
+            <Slide v-for="(image, index) in projects[1].images" :key="index">
+              <div class="group relative overflow-hidden aspect-video">
+                <img :src="image" 
+                     :alt="`${projects[1].name} - Image ${index + 1}`"
+                     class="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-[1.02]" />
+                <div class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="text-center p-4">
+                    <h3 class="text-xl font-bold text-white mb-2">{{ projects[1].name }}</h3>
+                    <p class="text-gray-300 mb-4">{{ projects[1].description }}</p>
+                    <button @click="openImage(image, `${projects[1].name} - Image ${index + 1}`)" 
+                       class="inline-flex items-center text-white border border-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors">
+                      View Image
+                      <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Slide>
+            <template #addons>
+              <Navigation />
+              <Pagination />
+            </template>
+          </Carousel>
         </div>
       </div>
     </section>
@@ -201,6 +268,15 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel';
+import 'vue3-carousel/dist/carousel.css';
+import { getImageUrl } from './utils/imageLoader';
+
+const financeReportImage = getImageUrl('Finance-Report');
+const ictAssetsInventory = getImageUrl('ict-assets-inventory');
+const inventoryManagementLogin = getImageUrl('inventory-management_login');
+const salesDashboardLogin = getImageUrl('sales-dashboard_login');
+const salesDashboardDashboard = getImageUrl('sales-dashboard_dashboard');
 
 import { 
   SunIcon, 
@@ -217,6 +293,8 @@ import {
 } from 'lucide-vue-next'
 
 const isDark = ref(false);
+const selectedImage = ref(null);
+const selectedImageAlt = ref('');
 const contactForm = ref({
   name: '',
   email: '',
@@ -224,6 +302,11 @@ const contactForm = ref({
 });
 
 import emailjs from '@emailjs/browser';
+
+const openImage = (image, alt) => {
+  selectedImage.value = image;
+  selectedImageAlt.value = alt;
+};
 
 const handleSubmit = async () => {
   try {
@@ -273,10 +356,12 @@ const handleSubmit = async () => {
     alert('Failed to send message. Please try again.');
   }
 };
+
 const navigation = ref([
   { name: 'About', href: '#about' },
   { name: 'Experience', href: '#experience' },
   { name: 'Skills', href: '#skills' },
+  { name: 'Visualizations', href: '#visualizations' },
   { name: 'Projects', href: '#projects' },
   { name: 'Contact', href: '#contact' }
 ]);
@@ -310,17 +395,25 @@ const skills = [
   { name: 'Frameworks', description: 'Django\nVue.js\nBootstrap', icon: LayersIcon }
 ]
 
+const visualizations = [
+  {
+    name: 'Financial Performance Dashboard',
+    description: 'Comprehensive financial metrics and product performance dashboard using Power BI',
+    image: financeReportImage
+  },
+];
+
 const projects = [
   {
-    name: 'Inventory Management System',
+    name: 'Inventory Management System for ICT-Assets Management',
     description: 'Web-based Inventory Management System with QR code capabilities',
-    image: '/placeholder.svg?height=300&width=400',
+    images: [inventoryManagementLogin, ictAssetsInventory],
     link: '#'
   },
   {
     name: 'Sales Dashboard',
     description: 'Web-based Sales Dashboard with Sales Prediction using Recurrent Neural Network',
-    image: '/placeholder.svg?height=300&width=400',
+    images: [salesDashboardLogin, salesDashboardDashboard],
     link: '#'
   }
 ]
