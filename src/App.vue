@@ -286,11 +286,18 @@
         </div>
       </div>
     </section>
+    <!-- Alert Component -->
+    <div v-if="showAlert" 
+         :class="['fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-all transform', 
+                 alertType === 'success' ? 'bg-green-500' : 'bg-red-500']">
+      <p class="text-white font-medium">{{ alertMessage }}</p>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { VueReCaptcha, useReCaptcha } from 'vue-recaptcha-v3';
 import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel';
 import 'vue3-carousel/dist/carousel.css';
 import { getImageUrl } from './utils/imageLoader';
@@ -328,6 +335,23 @@ const contactForm = ref({
   message: ''
 });
 
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('error');
+
+const validateEmail = (email) => {
+  return email.includes('@') && email.toLowerCase().includes('.com');
+};
+
+const showAlertMessage = (message, type = 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+  setTimeout(() => {
+    showAlert.value = false;
+  }, 3000);
+};
+
 import emailjs from '@emailjs/browser';
 
 const openImage = (viz) => {
@@ -345,8 +369,29 @@ const openProjectImage = (image, alt) => {
   selectedImageAlt.value = alt;
 };
 
+const { executeRecaptcha, recaptchaLoaded } = useReCaptcha();
+
 const handleSubmit = async () => {
   try {
+    // Validate empty fields
+    if (!contactForm.value.name || !contactForm.value.email || !contactForm.value.message) {
+      showAlertMessage('Please fill in all fields');
+      return;
+    }
+
+    // Execute reCAPTCHA
+    await recaptchaLoaded();
+    const token = await executeRecaptcha('submit');
+    if (!token) {
+      showAlertMessage('Failed to verify you are human. Please try again.');
+      return;
+    }
+
+    // Validate email format
+    if (!validateEmail(contactForm.value.email)) {
+      showAlertMessage('Please enter a valid email address');
+      return;
+    }
     // Check email rate limit
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -364,7 +409,7 @@ const handleSubmit = async () => {
     
     // Check if limit exceeded
     if (storedData.count >= 200) {
-      alert('Monthly email limit reached. Please try again next month.');
+      showAlertMessage('Monthly email limit reached. Please try again next month.');
       return;
     }
 
@@ -386,11 +431,11 @@ const handleSubmit = async () => {
     storedData.count++;
     localStorage.setItem('emailData', JSON.stringify(storedData));
 
-    alert('Message sent successfully!');
+    showAlertMessage('Message sent successfully!', 'success');
     contactForm.value = { name: '', email: '', message: '' };
   } catch (error) {
     console.error('Error sending email:', error);
-    alert('Failed to send message. Please try again.');
+    showAlertMessage('Failed to send message. Please try again.');
   }
 };
 
